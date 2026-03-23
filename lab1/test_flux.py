@@ -1,6 +1,7 @@
 import numpy as np
 from FEM import FEM_space
-
+################################################################################
+savepath = "figures/"
 ################################################################################
 x_left = -5.0
 x_right = 5.0
@@ -33,8 +34,22 @@ fu_exact_fine = fu_exact @ phi.T
 ################################################################################
 # plot
 import matplotlib.pyplot as plt
-plt.figure()
-plt.plot(x_fine.flatten(), fu_fine.flatten(), color="blue", linestyle = "-")
-plt.plot(x_fine.flatten(), fu_exact_fine.flatten(), color="red", linestyle = "--")
-plt.grid()
-plt.show()
+# set global font sizes for all matplotlib text elements
+plt.rcParams.update({
+    "font.size": 18,
+    "axes.titlesize": 20,
+    "axes.labelsize": 18,
+    "xtick.labelsize": 16,
+    "ytick.labelsize": 16,
+    "legend.fontsize": 16,
+    "figure.titlesize": 22,
+})
+
+fig, ax = plt.subplots(figsize=(8,6))
+ax.plot(x_fine.flatten(), fu_fine.flatten(), color="blue", linestyle = "-", \
+         label="implemented flux function")
+ax.plot(x_fine.flatten(), fu_exact_fine.flatten(), color="red", \
+         linestyle = "--", label="exact flux function")
+ax.grid()
+ax.legend()
+plt.savefig(savepath + "flux_function.png", dpi=300)
