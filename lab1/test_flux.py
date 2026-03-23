@@ -5,8 +5,8 @@ savepath = "figures/"
 ################################################################################
 x_left = -5.0
 x_right = 5.0
-N_element = 8
-P = 5
+N_element = 10
+P = 7
 node_type = "GLL"
 
 domain = np.linspace(x_left, x_right, N_element + 1)
@@ -14,8 +14,8 @@ Xh = FEM_space(node_type, P, domain, 1, "linear")
 
 ################################################################################
 x = Xh.mesh["x"]
-u = np.exp(-(x*x))
-nu = 0.0
+u = -np.exp(-(x*x))
+nu = 1e-1
 dfudx_weak = Xh.dfluxdx_weak_compute(u, nu)
 # for it to be C0 continuity
 dfudx = dfudx_weak/Xh.mesh["B"]
@@ -49,9 +49,9 @@ plt.rcParams.update({
 
 fig, ax = plt.subplots(figsize=(8,6))
 ax.plot(x_fine.flatten(), dfudx_fine.flatten(), color="blue", linestyle = "-", \
-         label="implemented flux function")
+         label=r"implemented $\frac{\partial f(u)}{\partial x}$")
 ax.plot(x_fine.flatten(), dfudx_exact_fine.flatten(), color="red", \
-         linestyle = "--", label="exact flux function")
+         linestyle = "--", label=r"exact $\frac{\partial f(u)}{\partial x}$")
 ax.grid()
 ax.legend()
 plt.savefig(savepath + "flux_function_dx.png", dpi=300)
