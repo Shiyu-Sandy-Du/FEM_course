@@ -16,9 +16,11 @@ Xh = FEM_space(node_type, P, domain, 1, "linear")
 x = Xh.mesh["x"]
 u = np.exp(-(x*x))
 nu = 0.0
-fu_weak = Xh.flux_avgC0(u, nu)
-fu = fu_weak/Xh.mesh["B"]
-fu_exact = 2*x*np.exp(-2*(x*x)) + nu*nu* (2 - 4*x*x) *np.exp(-(x*x))
+dfudx_weak = Xh.dfluxdx_weak_compute(u, nu)
+# for it to be C0 continuity
+dfudx = dfudx_weak/Xh.mesh["B"]
+dfudx = Xh.avgC0(dfudx)
+dfudx_exact = 2*x*np.exp(-2*(x*x)) + nu*nu* (2 - 4*x*x) *np.exp(-(x*x))
 
 ################################################################################
 # refine the results by spectral interpolation
@@ -28,8 +30,8 @@ xi, _ = gll_lib.gLLNodesAndWeights(P+1)
 x_hat = np.linspace(-1, 1, n_intp)
 phi = gll_lib.interp_matrix_1D(xi, x_hat)
 x_fine = x @ phi.T
-fu_fine = fu @ phi.T
-fu_exact_fine = fu_exact @ phi.T
+dfudx_fine = dfudx @ phi.T
+dfudx_exact_fine = dfudx_exact @ phi.T
 
 ################################################################################
 # plot
@@ -46,10 +48,10 @@ plt.rcParams.update({
 })
 
 fig, ax = plt.subplots(figsize=(8,6))
-ax.plot(x_fine.flatten(), fu_fine.flatten(), color="blue", linestyle = "-", \
+ax.plot(x_fine.flatten(), dfudx_fine.flatten(), color="blue", linestyle = "-", \
          label="implemented flux function")
-ax.plot(x_fine.flatten(), fu_exact_fine.flatten(), color="red", \
+ax.plot(x_fine.flatten(), dfudx_exact_fine.flatten(), color="red", \
          linestyle = "--", label="exact flux function")
 ax.grid()
 ax.legend()
-plt.savefig(savepath + "flux_function.png", dpi=300)
+plt.savefig(savepath + "flux_function_dx.png", dpi=300)

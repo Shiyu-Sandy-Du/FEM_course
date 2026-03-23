@@ -59,22 +59,25 @@ class FEM_space:
     def conv(self, A, u):
         return u @ A.T
 
+    # Force a field u with C0 continuity in the end by averaging
+    def avgC0(self, u_discontinuous):
+        # Gather
+        u_left = u_discontinuous[1:,0]
+        u_right = u_discontinuous[:-1,-1]
+        u_interface = (u_left + u_right)/2.0
+        # Scatter
+        u_discontinuous[1:,0] = u_interface
+        u_discontinuous[:-1,-1] = u_interface
+        return u_discontinuous
+
     # Compute the flux function on element basis
-    def flux_weak(self, u, nu):
+    def dfluxdx_weak_compute(self, u, nu):
         # Here the advection term computation does not include the de-aliasing
         adv = u * u / 2.0
         diff = nu*nu * (self.conv(self.D, u)) * self.mesh["Jinv"]
         integral_volume = self.conv(self.Dt, (adv - diff) * self.weights)
-        return integral_volume
+     
+        dfluxdx_weak = integral_volume  
 
-    # Compute the flux function with C0 continuity in the end by averaging
-    def flux_avgC0(self, u, nu):
-        flux_discontinuous = self.flux_weak(u, nu)
-        # Gather fluxes
-        flux_left = flux_discontinuous[1:,0]
-        flux_right = flux_discontinuous[:-1,-1]
-        flux = (flux_left + flux_right)/2.0
-        # Scatter fluxes
-        flux_discontinuous[1:,0] = flux
-        flux_discontinuous[:-1,-1] = flux
-        return flux_discontinuous
+        return dfluxdx_weak
+
