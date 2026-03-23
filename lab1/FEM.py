@@ -77,7 +77,7 @@ class FEM_space:
         diff = nu*nu * (self.conv(self.D, u)) * self.mesh["Jinv"]
         integral_volume = self.conv(self.Dt, (adv - diff) * self.weights)
      
-        dfluxdx_weak = integral_volume  
+        dfluxdx_weak = - integral_volume  
 
         return dfluxdx_weak
 

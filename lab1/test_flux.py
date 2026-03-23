@@ -20,7 +20,7 @@ dfudx_weak = Xh.dfluxdx_weak_compute(u, nu)
 # for it to be C0 continuity
 dfudx = dfudx_weak/Xh.mesh["B"]
 dfudx = Xh.avgC0(dfudx)
-dfudx_exact = 2*x*np.exp(-2*(x*x)) + nu*nu* (2 - 4*x*x) *np.exp(-(x*x))
+dfudx_exact =  - 2*x*np.exp(-2*(x*x)) - nu*nu* (2 - 4*x*x) *np.exp(-(x*x))
 
 ################################################################################
 # refine the results by spectral interpolation
