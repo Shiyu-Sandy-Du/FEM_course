@@ -15,12 +15,10 @@ Xh = FEM_space(node_type, P, domain, 1, "linear")
 ################################################################################
 x = Xh.mesh["x"]
 u = -np.exp(-(x*x))
-nu = 1e-1
-dfudx_weak = Xh.dfluxdx_weak_compute(u, nu)
-# for it to be C0 continuity
+nu2 = 1e-1
+dfudx_weak = Xh.dfluxdx_weak_compute_1d(u, nu2)
 dfudx = dfudx_weak/Xh.mesh["B"]
-dfudx = Xh.avgC0(dfudx)
-dfudx_exact =  - 2*x*np.exp(-2*(x*x)) - nu*nu* (2 - 4*x*x) *np.exp(-(x*x))
+dfudx_exact =  - 2*x*np.exp(-2*(x*x)) - nu2* (2 - 4*x*x) *np.exp(-(x*x))
 
 ################################################################################
 # refine the results by spectral interpolation

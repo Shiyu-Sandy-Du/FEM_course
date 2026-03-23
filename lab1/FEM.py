@@ -40,6 +40,7 @@ class FEM_space:
                     self.mesh["Jinv"][i,:] = 2.0/self.mesh["h"][i] 
                     self.mesh["J"][i,:] = self.mesh["h"][i]/2.0
                     self.mesh["B"][i,:] = self.weights * self.mesh["h"][i]/2.0
+                self.mesh["B"] = self.gs_add(self.mesh["B"])
             else:
                 raise ValueError("the mapping method is only" + \
                       " implemented for linear mapping")
@@ -60,7 +61,7 @@ class FEM_space:
         return u @ A.T
 
     # Force a field u with C0 continuity in the end by averaging
-    def avgC0(self, u_discontinuous):
+    def gs_avgC0(self, u_discontinuous):
         # Gather
         u_left = u_discontinuous[1:,0]
         u_right = u_discontinuous[:-1,-1]
@@ -69,15 +70,30 @@ class FEM_space:
         u_discontinuous[1:,0] = u_interface
         u_discontinuous[:-1,-1] = u_interface
         return u_discontinuous
+    
+    def gs_add(self, u_discontinuous):
+        # Gather
+        u_left = u_discontinuous[1:,0]
+        u_right = u_discontinuous[:-1,-1]
+        u_interface = u_left + u_right
+        # Scatter
+        u_discontinuous[1:,0] = u_interface
+        u_discontinuous[:-1,-1] = u_interface
+        return u_discontinuous
 
     # Compute the flux function on element basis
-    def dfluxdx_weak_compute(self, u, nu):
+    def dfluxdx_weak_compute_1d(self, u, nu2):
         # Here the advection term computation does not include the de-aliasing
         adv = u * u / 2.0
-        diff = nu*nu * (self.conv(self.D, u)) * self.mesh["Jinv"]
-        integral_volume = self.conv(self.Dt, (adv - diff) * self.weights)
+        diff = nu2 * (self.conv(self.D, u)) * self.mesh["Jinv"]
+        flux = (adv - diff)
+
+        integral_volume = self.conv(self.Dt, flux * self.weights)
+        integral_volume = self.gs_add(integral_volume)
      
-        dfluxdx_weak = - integral_volume  
+        dfluxdx_weak =  - integral_volume
+        dfluxdx_weak[0,0] += -adv[0,0] # Neumann BC
+        dfluxdx_weak[-1,-1] += adv[-1,-1]
 
         return dfluxdx_weak
 
