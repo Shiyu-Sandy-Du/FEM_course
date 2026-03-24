@@ -1,10 +1,12 @@
 class RHS:
-    def __init__(self, nu2, Xh):
+    def __init__(self, nu2, Xh, BC_dirichlet):
         self.nu2 = nu2
         self.Xh = Xh
+        self.BC_dirichlet = BC_dirichlet
         
     def RHS_maker(self, u, t): # t is a dummy argument for the moment
-        dudt = -self.Xh.dfluxdx_weak_compute_1d(u, self.nu2)\
+        dudt = -self.Xh.dfluxdx_weak_compute_1d(u, self.nu2, \
+                                                self.BC_dirichlet)\
                /self.Xh.mesh["B"]
         # dudt = self.Xh.avgC0(dudt)
         # dudt[0,0] = 1.0

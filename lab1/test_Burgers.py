@@ -6,10 +6,10 @@ from RHS import RHS
 savepath = "figures/"
     
 ################################################################################
-x_left = -4.0
-x_right = 4.0
-N_element = 30
-P = 5
+x_left = -3.0
+x_right = 5.0
+N_element = 40
+P = 7
 node_type = "GLL"
 
 domain = np.linspace(x_left, x_right, N_element + 1)
@@ -19,7 +19,7 @@ Xh = FEM_space(node_type, P, domain, 1, "linear")
 x = Xh.mesh["x"]
 
 x0 = 0.0
-for i_case in [0]:
+for i_case in range(3):
     if i_case == 0:
         case_name = "burgers_shock"
         uL = 1.0
@@ -42,8 +42,8 @@ for i_case in [0]:
     u0[x>=x0] = uR
 
     nu2 = 1e-3
-
-    RHS_f = RHS(nu2, Xh)
+    BC_dirichlet = [uL,uR]
+    RHS_f = RHS(nu2, Xh, BC_dirichlet)
 
     ################################################################################
     # set up the temporal discretisation
