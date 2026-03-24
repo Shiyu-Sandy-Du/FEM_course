@@ -88,12 +88,16 @@ class FEM_space:
         diff = nu2 * (self.conv(self.D, u)) * self.mesh["Jinv"]
         flux = (adv - diff)
 
+        # Integration
         integral_volume = self.conv(self.Dt, flux * self.weights)
         integral_volume = self.gs_add(integral_volume)
      
         dfluxdx_weak =  - integral_volume
-        dfluxdx_weak[0,0] += -adv[0,0] # Neumann BC
-        dfluxdx_weak[-1,-1] += adv[-1,-1]
+        # Dirichlet BC
+        flux_L = 1.0*1.0/2.0 - diff[0,0]
+        flux_R = -diff[-1,-1]
+        dfluxdx_weak[0,0] += -flux_L
+        dfluxdx_weak[-1,-1] += flux_R
 
         return dfluxdx_weak
 

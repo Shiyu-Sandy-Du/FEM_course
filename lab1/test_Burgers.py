@@ -6,10 +6,10 @@ from RHS import RHS
 savepath = "figures/"
     
 ################################################################################
-x_left = -5.0
-x_right = 5.0
-N_element = 70
-P = 7
+x_left = -4.0
+x_right = 4.0
+N_element = 30
+P = 5
 node_type = "GLL"
 
 domain = np.linspace(x_left, x_right, N_element + 1)
@@ -19,12 +19,12 @@ Xh = FEM_space(node_type, P, domain, 1, "linear")
 x = Xh.mesh["x"]
 
 x0 = 0.0
-for i_case in range(3):
+for i_case in [0]:
     if i_case == 0:
         case_name = "burgers_shock"
         uL = 1.0
         uR = 0.0
-        dt = 1e-5
+        dt = 1e-4
     elif i_case == 1:
         case_name = "burgers_trivial"
         uL = 0.0
