@@ -19,29 +19,38 @@ Xh = FEM_space(node_type, P, domain, 1, "linear")
 x = Xh.mesh["x"]
 
 x0 = 0.0
-for i_case in range(3):
+for i_case in [3]:
     if i_case == 0:
         case_name = "burgers_shock"
         uL = 1.0
         uR = 0.0
         dt = 1e-4
+        nu2 = 1e-3
     elif i_case == 1:
         case_name = "burgers_trivial"
         uL = 0.0
         uR = 0.0
         dt = 1e-2
+        nu2 = 1e-3
     elif i_case == 2:
         case_name = "burgers_rarefaction"
         uL = 0.0
         uR = 1.0
         dt = 1e-2
+        nu2 = 1e-3
+    elif i_case == 3:
+        case_name = "burgers_shock_strong_stab"
+        uL = 1.0
+        uR = 0.0
+        dt = 1e-4
+        nu2 = 5e-3
     print("running case: " + case_name)
 
     u0 = np.zeros_like(x)
     u0[x<x0] = uL
     u0[x>=x0] = uR
 
-    nu2 = 1e-3
+
     BC_dirichlet = [uL,uR]
     RHS_f = RHS(nu2, Xh, BC_dirichlet)
 
@@ -98,7 +107,7 @@ for i_case in range(3):
     fig, ax = plt.subplots(figsize=(8,6))
     ax.plot(x_fine.flatten(), u_fine.flatten(), color="blue", linestyle = "-", \
             label="numerical solution")
-    if i_case == 0:
+    if i_case in [0,3]:
         ax.plot(x_fine.flatten(), u_exact_fine.flatten(), color="red", \
                 linestyle = "--", label="exact solution")
     ax.grid()
