@@ -82,9 +82,8 @@ class FEM_space:
         return u_discontinuous
 
     # Compute the flux function on element basis
-    def dfluxdx_weak_compute_1d(self, u, nu2, BC_dirichlet):
-        u[0,0] = BC_dirichlet[0]
-        u[-1,-1] = BC_dirichlet[-1]
+    def dfluxdx_weak_compute_1d(self, u, nu2):
+
         # Here the advection term computation does not include the de-aliasing
         adv = u * u / 2.0
         diff = nu2 * (self.conv(self.D, u)) * self.mesh["Jinv"]
@@ -95,11 +94,11 @@ class FEM_space:
         integral_volume = self.gs_add(integral_volume)
      
         dfluxdx_weak =  - integral_volume
-        # Dirichlet BC
-        flux_L = flux[0,0]
-        flux_R = flux[-1,-1]
-        dfluxdx_weak[0,0] += -flux_L
-        dfluxdx_weak[-1,-1] += flux_R
+        
+        # flux_L = ...
+        # flux_R = ...
+        # dfluxdx_weak[0,0] += -flux_L
+        # dfluxdx_weak[-1,-1] += flux_R
 
         return dfluxdx_weak
 

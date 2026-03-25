@@ -6,8 +6,8 @@ from RHS import RHS
 savepath = "figures/"
     
 ################################################################################
-x_left = -3.0
-x_right = 5.0
+x_left = -4.0
+x_right = 4.0
 N_element = 40
 P = 7
 node_type = "GLL"
@@ -58,11 +58,14 @@ for i_case in range(3):
     for i_step in range(1, nt):
         # print("time step:", i_step, "current time:", t[i_step])
         u_current = RK4_step(RHS_f.RHS_maker, u_current, t[i_step - 1], dt)
+        # implement the BC at the end of each time step (a RK step)
+        u_current = RHS_f.dirichlet_BC_apply(u_current)
 
     ################################################################################
     # the exact solution
     s = (uL + uR)/2.0
-    u_exact = s + (uR-uL)/2.0 * np.tanh((x-s*t[-1])*(uL-uR)/4.0/nu2)
+    # s = 0.0
+    u_exact = (uL + uR)/2.0 + (uR-uL)/2.0 * np.tanh((x-s*t_end)*(uL-uR)/4.0/nu2)
 
     ################################################################################
     # refine the results by spectral interpolation
@@ -74,8 +77,10 @@ for i_case in range(3):
     x_fine = x @ phi.T
     u_fine = u_current @ phi.T
 
-    # u_exact_fine = u_exact @ phi.T
-    u_exact_fine = s + (uR-uL)/2.0 * np.tanh((x_fine-s*t[-1])*(uL-uR)/4.0/nu2)
+    u_exact_fine = (uL + uR)/2.0 + (uR-uL)/2.0 * np.tanh((x_fine-s*t_end)*(uL-uR)/4.0/nu2)
+    # check for a heat equation
+    # from scipy.special import erfc
+    # u_exact_fine = 1.0/2.0 * erfc(x_fine/2/np.sqrt(nu2*t_end))
     ################################################################################
     # plot
     import matplotlib.pyplot as plt
