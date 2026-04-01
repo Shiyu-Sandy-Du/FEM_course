@@ -28,18 +28,20 @@ class FEM_space:
             self.mesh["h"] = np.diff(element)
             # the mesh
             self.mesh["x"] = np.empty((self.nelem, self.lx))
-            # Jacobian
+            # Jacobian dx/dxi
             self.mesh["J"] = np.empty((self.nelem, self.lx))
             # the inverse of Jacobian
             self.mesh["Jinv"] = np.empty((self.nelem, self.lx))
             # the mass matrix
             self.mesh["B"] = np.empty((self.nelem, self.lx))
+            self.mesh["B_sep"] = np.empty((self.nelem, self.lx))
             # set up the Jacobian and its inverse
             if mapping_method == "linear":
                 for i in range(self.nelem):
                     self.mesh["Jinv"][i,:] = 2.0/self.mesh["h"][i] 
                     self.mesh["J"][i,:] = self.mesh["h"][i]/2.0
                     self.mesh["B"][i,:] = self.weights * self.mesh["h"][i]/2.0
+                    self.mesh["B_sep"][i,:] = self.weights * self.mesh["h"][i]/2.0
                 self.mesh["B"] = self.gs_add(self.mesh["B"])
             else:
                 raise ValueError("the mapping method is only" + \
@@ -80,6 +82,11 @@ class FEM_space:
         u_discontinuous[1:,0] = u_interface
         u_discontinuous[:-1,-1] = u_interface
         return u_discontinuous
+    
+    def interface_half(self, u):
+        u[1:,0] /= 2.0
+        u[:-1,-1] /= 2.0
+        return u
 
     # Compute the flux function on element basis
     def dfluxdx_weak_compute_1d(self, u, nu2):
